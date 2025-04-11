@@ -1,0 +1,5 @@
+PROFILE_CREATED = "Profile created successfully"
+PROFILE_NOT_FOUND = "Profile not found"
+BAD_REQUEST = "Bad request error"
+SERVER_ERROR = "Internal server error"
+PROFILE_ALREADY_EXISTS = "Profile already exists for this user"

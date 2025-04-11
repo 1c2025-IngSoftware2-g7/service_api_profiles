@@ -1,0 +1,53 @@
+services:
+  profiles_db:
+    image: postgres
+    environment:
+      POSTGRES_USER: profile_db
+      POSTGRES_PASSWORD: profile-pass
+      POSTGRES_DB: classconnect_profiles
+    ports:
+      - "5433:5432"
+    networks:
+      - profiles_network
+    volumes:
+      - ./initialize_profiles_db.sql:/docker-entrypoint-initdb.d/initialize_profiles_db.sql
+
+  profiles_app:
+    build: .
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=src.app:profiles_app
+      - PYTHONPATH=/src
+    ports:
+      - "8081:8080"
+    depends_on:
+      - profiles_db
+    networks:
+      - profiles_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 60s
+      timeout: 2s
+      retries: 10
+
+  test:
+    build: .
+    environment:
+      - FLASK_ENV=testing
+      - PYTHONPATH=/src/app
+    depends_on:
+      profiles_db:
+        condition: service_started
+      profiles_app:
+        condition: service_healthy
+    networks:
+      - profiles_network
+    command: pytest --cov=src --cov-report=xml:/coverage/coverage.xml tests/
+    volumes:
+      - ./coverage:/coverage
+    env_file:
+      - .env
+
+networks:
+  profiles_network:
+    driver: bridge
