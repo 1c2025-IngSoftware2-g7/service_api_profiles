@@ -37,3 +37,9 @@ def create_profile():
 def get_specific_profiles(uuid):
     result = profile_controller.get_specific_profiles(uuid)
     return result["response"], result["code_status"]
+
+
+@profiles_app.put("/profiles/modify")
+def modify_profile():
+    result = profile_controller.modify_profile(request)
+    return result["response"], result["code_status"]

@@ -29,3 +29,11 @@ class ProfileService:
         if not profile:
             return None
         return profile
+    
+    def modify_profile(self, uuid, updates):
+        # Validar que el perfil exista
+        if not self.profile_repository.profile_exists(uuid):
+            raise ValueError("Profile not found")
+
+        # Actualizar en la base de datos
+        return self.profile_repository.update_profile(uuid, updates)

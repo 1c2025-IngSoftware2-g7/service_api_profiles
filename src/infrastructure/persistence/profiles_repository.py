@@ -69,3 +69,28 @@ class ProfilesRepository(BaseEntity):
         columns = [desc[0] for desc in self.cursor.description]
         profile_data = dict(zip(columns, profile))
         return self._parse_profile(profile_data)
+
+    def update_profile(self, uuid, updates):
+        # Construir la consulta dinámica
+        set_clause = ", ".join([f"{field} = %s" for field in updates.keys()])
+        query = f"""
+            UPDATE profiles
+            SET {set_clause}, updated_at = NOW()
+            WHERE uuid = %s
+            RETURNING *
+        """
+
+        params = list(updates.values()) + [uuid]
+
+        self.cursor.execute(query, params)
+        self.conn.commit()
+
+        updated_profile = self.cursor.fetchone()
+        if not updated_profile:
+            raise ValueError("Profile not found after update")
+
+        # Convertir a diccionario
+        columns = [desc[0] for desc in self.cursor.description]
+        profile_data = dict(zip(columns, updated_profile))
+
+        return self._parse_profile(profile_data)

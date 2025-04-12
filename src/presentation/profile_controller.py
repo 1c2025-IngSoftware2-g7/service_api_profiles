@@ -98,3 +98,77 @@ class ProfileController:
                 }),
                 "code_status": 500
             }
+
+    def modify_profile(self, request):
+        if not request.is_json:
+            return {
+                "response": jsonify({"error": BAD_REQUEST}),
+                "code_status": 400
+            }
+
+        try:
+            data = request.get_json()
+            uuid = data.get("uuid")
+            updates = data.get("updates")
+
+            # Validaciones básicas
+            if not uuid or not updates:
+                return {
+                    "response": jsonify({"error": "UUID and updates are required"}),
+                    "code_status": 400
+                }
+
+            # Campos no modificables
+            if "email" in updates or "password" in updates:
+                return {
+                    "response": jsonify({"error": "Email and password cannot be modified"}),
+                    "code_status": 400
+                }
+
+            # Validar campos permitidos
+            allowed_fields = ["name", "surname",
+                            "location", "profile_picture", "role"]
+            for field in updates.keys():
+                if field not in allowed_fields:
+                    return {
+                        "response": jsonify({"error": f"Field '{field}' cannot be modified"}),
+                        "code_status": 400
+                    }
+
+            # Validar rol si está presente
+            if "role" in updates:
+                valid_roles = ['student', 'teacher', 'admin']
+                if updates["role"] not in valid_roles:
+                    return {
+                        "response": jsonify({
+                            "error": "Invalid role",
+                            "detail": f"Role must be one of: {', '.join(valid_roles)}"
+                        }),
+                        "code_status": 400
+                    }
+
+            # Actualizar el perfil
+            updated_profile = self.profile_service.modify_profile(uuid, updates)
+
+            return {
+                "response": jsonify({
+                    "message": "Profile updated successfully",
+                    "data": {
+                        "uuid": updated_profile.uuid,
+                        "updated_fields": updates
+                    }
+                }),
+                "code_status": 200
+            }
+
+        except ValueError as e:
+            return {
+                "response": jsonify({"error": BAD_REQUEST, "detail": str(e)}),
+                "code_status": 400
+            }
+        except Exception as e:
+            self.log.error(f"Error modifying profile: {str(e)}")
+            return {
+                "response": jsonify({"error": SERVER_ERROR}),
+                "code_status": 500
+            }
