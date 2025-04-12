@@ -35,16 +35,19 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO profile_db;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create profiles table with explicit UUID (no default)
+DROP TABLE IF EXISTS profiles;
 
-CREATE TABLE IF NOT EXISTS profiles (
-    uuid UUID PRIMARY KEY, 
-    name TEXT NOT NULL,
-    surname TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('student', 'teacher', 'admin')),
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
+CREATE TABLE profiles (
+    uuid UUID PRIMARY KEY,
+    email TEXT NOT NULL,
+    role TEXT NOT NULL,
+    display_name TEXT,
+    phone TEXT,
     location TEXT,
-    profile_picture TEXT,
+    birthday TEXT,
+    gender TEXT,
+    description TEXT,
+    display_image TEXT,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
