@@ -31,3 +31,9 @@ Expects JSON with: uuid, name, surname, email, etc.
 def create_profile():
     result = profile_controller.create_profile(request)
     return result["response"], result["code_status"]
+
+
+@profiles_app.get("/profiles/<uuid:uuid>")
+def get_specific_profiles(uuid):
+    result = profile_controller.get_specific_profiles(uuid)
+    return result["response"], result["code_status"]

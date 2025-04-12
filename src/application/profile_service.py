@@ -1,4 +1,5 @@
 from src.infrastructure.persistence.profiles_repository import ProfilesRepository
+from src.domain.profile import Profile
 
 
 class ProfileService:
@@ -22,3 +23,9 @@ class ProfileService:
 
         # Insertar en la base de datos
         return self.profile_repository.insert_profile(profile_data)
+
+    def get_specific_profile(self, uuid):
+        profile = self.profile_repository.get_profile(uuid)
+        if not profile:
+            return None
+        return profile

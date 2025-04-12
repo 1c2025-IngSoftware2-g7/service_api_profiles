@@ -1,6 +1,7 @@
 from flask import jsonify
-from src.headers import PROFILE_CREATED, BAD_REQUEST, PROFILE_ALREADY_EXISTS, SERVER_ERROR
+from src.headers import PROFILE_CREATED, BAD_REQUEST, PROFILE_NOT_FOUND, PROFILE_ALREADY_EXISTS, SERVER_ERROR
 from src.application.profile_service import ProfileService
+from src.domain.profile import Profile
 
 
 class ProfileController:
@@ -49,6 +50,47 @@ class ProfileController:
             }
         except Exception as e:
             self.log.error(f"Error creating profile: {str(e)}")
+            return {
+                "response": jsonify({
+                    "error": SERVER_ERROR,
+                    "detail": "Internal server error"
+                }),
+                "code_status": 500
+            }
+
+    def get_specific_profiles(self, uuid):
+        try:
+            profile = self.profile_service.get_specific_profile(uuid)
+
+            if profile:
+                return {
+                    "response": jsonify({
+                        "data": {
+                            "uuid": profile.uuid,
+                            "name": profile.name,
+                            "surname": profile.surname,
+                            "email": profile.email,
+                            "role": profile.role,
+                            "location": profile.location,
+                            "profile_picture": profile.profile_picture
+                        }
+                    }),
+                    "code_status": 200
+                }
+
+            return {
+                "response": jsonify({
+                    "type": "about:blank",
+                    "title": PROFILE_NOT_FOUND,
+                    "status": 404,
+                    "detail": f"Profile with UUID {uuid} not found",
+                    "instance": f"/profiles/{uuid}"
+                }),
+                "code_status": 404
+            }
+
+        except Exception as e:
+            self.log.error(f"Error fetching profile: {str(e)}")
             return {
                 "response": jsonify({
                     "error": SERVER_ERROR,
