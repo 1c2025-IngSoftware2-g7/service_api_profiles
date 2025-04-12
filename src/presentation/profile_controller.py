@@ -67,12 +67,15 @@ class ProfileController:
                     "response": jsonify({
                         "data": {
                             "uuid": profile.uuid,
-                            "name": profile.name,
-                            "surname": profile.surname,
                             "email": profile.email,
                             "role": profile.role,
+                            "display_name": profile.display_name,
                             "location": profile.location,
-                            "profile_picture": profile.profile_picture
+                            "birthday": profile.birthday,
+                            "gender": profile.gender,
+                            "description": profile.description,
+                            "display_image": profile.display_image,
+                            "phone": profile.phone  # Nuevo campo
                         }
                     }),
                     "code_status": 200
@@ -126,8 +129,9 @@ class ProfileController:
                 }
 
             # Validar campos permitidos
-            allowed_fields = ["name", "surname",
-                            "location", "profile_picture", "role"]
+            allowed_fields = ["display_name", "location", "birthday",
+                              "gender", "description", "display_image",
+                              "phone"]
             for field in updates.keys():
                 if field not in allowed_fields:
                     return {

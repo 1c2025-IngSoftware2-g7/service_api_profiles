@@ -7,56 +7,68 @@ from src.infrastructure.persistence.base_entity import BaseEntity
 class ProfilesRepository(BaseEntity):
     def __init__(self, logger):
         self.log = logger
-        super().__init__()  # Inicializa self.conn y self.cursor (heredado de BaseEntity)
+        super().__init__()
 
     def _parse_profile(self, profile_data):
-        """Convierte datos de la DB a objeto Profile (similar a _parse_user en UsersRepository)"""
+        """Convierte datos de la DB a objeto Profile"""
         return Profile(
             uuid=profile_data["uuid"],
-            name=profile_data["name"],
-            surname=profile_data["surname"],
             email=profile_data["email"],
-            password=profile_data["password"],
             role=profile_data["role"],
-            location=profile_data.get("location"),  # Ahora es str
-            profile_picture=profile_data.get("profile_picture")
+            display_name=profile_data["display_name"],
+            phone=profile_data["phone"],
+            location=profile_data["location"],
+            birthday=profile_data["birthday"],
+            gender=profile_data["gender"],
+            description=profile_data["description"],
+            display_image=profile_data["display_image"]
         )
 
     def profile_exists(self, profile_uuid: str) -> bool:
-        """Verifica si un perfil existe (similar a check_email en UsersRepository)"""
+        """Verifica si un perfil existe"""
         query = "SELECT 1 FROM profiles WHERE uuid = %s LIMIT 1"
         params = (str(profile_uuid),)
         self.cursor.execute(query, params)
         return bool(self.cursor.fetchone())
 
     def insert_profile(self, profile_data: dict):
-        """Inserta un perfil (similar a insert_user en UsersRepository)"""
+        """Inserta un nuevo perfil con campos obligatorios y opcionales"""
         query = """
         INSERT INTO profiles (
-            uuid, name, surname, email, password, role, location, profile_picture
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        # Hashear la contraseña
-        profile_data["password"] = generate_password_hash(
-            profile_data["password"])
-
-        params = (
-            profile_data["uuid"],
-            profile_data["name"],
-            profile_data["surname"],
-            profile_data["email"],
-            profile_data["password"],
-            profile_data["role"],
-            profile_data.get("location"),
-            profile_data.get("profile_picture")
+            uuid, email, role, display_name, location, 
+            birthday, gender, description, display_image, phone
+        ) VALUES (
+            %(uuid)s, %(email)s, %(role)s, %(display_name)s, %(location)s,
+            %(birthday)s, %(gender)s, %(description)s, %(display_image)s, %(phone)s
         )
+        RETURNING *
+        """
 
-        self.cursor.execute(query, params)
+        # Validar campos obligatorios
+        required_fields = ['uuid', 'email', 'role']
+        missing_fields = [
+            field for field in required_fields if field not in profile_data]
+        if missing_fields:
+            raise ValueError(
+                f"Missing required fields: {', '.join(missing_fields)}")
+
+        # Establecer valores por defecto como NULL para campos opcionales no proporcionados
+        optional_fields = ['display_name', 'location',
+                        'birthday', 'gender', 'description', 'display_image']
+        for field in optional_fields:
+            if field not in profile_data:
+                profile_data[field] = None
+
+        self.cursor.execute(query, profile_data)
         self.conn.commit()
-        return self._parse_profile(profile_data)
+
+        # Obtener y retornar el perfil creado
+        new_profile = self.cursor.fetchone()
+        columns = [desc[0] for desc in self.cursor.description]
+        return self._parse_profile(dict(zip(columns, new_profile)))
 
     def get_profile(self, uuid):
-        """Obtiene un perfil por UUID (similar a get_user en UsersRepository)"""
+        """Obtiene un perfil por UUID"""
         query = "SELECT * FROM profiles WHERE uuid = %s"
         params = (str(uuid),)
         self.cursor.execute(query, params)
@@ -65,7 +77,7 @@ class ProfilesRepository(BaseEntity):
         if not profile:
             return None
 
-        # Mapear resultados a un diccionario (asumiendo que cursor.description existe)
+        # Mapear resultados a un diccionario
         columns = [desc[0] for desc in self.cursor.description]
         profile_data = dict(zip(columns, profile))
         return self._parse_profile(profile_data)
