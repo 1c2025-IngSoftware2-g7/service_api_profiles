@@ -58,38 +58,50 @@ class ProfileController:
                 "code_status": 500
             }
 
-    def get_specific_profiles(self, uuid):
+    def get_specific_profiles(self, uuid, public_view=False):
         try:
             profile = self.profile_service.get_specific_profile(uuid)
 
-            if profile:
+            if not profile:
                 return {
                     "response": jsonify({
-                        "data": {
-                            "uuid": profile.uuid,
-                            "email": profile.email,
-                            "role": profile.role,
-                            "display_name": profile.display_name,
-                            "location": profile.location,
-                            "birthday": profile.birthday,
-                            "gender": profile.gender,
-                            "description": profile.description,
-                            "display_image": profile.display_image,
-                            "phone": profile.phone  # Nuevo campo
-                        }
+                        "type": "about:blank",
+                        "title": PROFILE_NOT_FOUND,
+                        "status": 404,
+                        "detail": f"Profile with UUID {uuid} not found",
+                        "instance": f"/profiles/{uuid}"
                     }),
-                    "code_status": 200
+                    "code_status": 404
+                }
+
+            if public_view:
+                # Solo campos públicos
+                response_data = {
+                    "display_name": profile.display_name,
+                    "phone": profile.phone,
+                    "birthday": profile.birthday,
+                    "gender": profile.gender,
+                    "description": profile.description,
+                    "display_image": profile.display_image
+                }
+            else:
+                # Todos los campos (vista privada)
+                response_data = {
+                    "uuid": profile.uuid,
+                    "email": profile.email,
+                    "role": profile.role,
+                    "display_name": profile.display_name,
+                    "location": profile.location,
+                    "birthday": profile.birthday,
+                    "gender": profile.gender,
+                    "description": profile.description,
+                    "display_image": profile.display_image,
+                    "phone": profile.phone
                 }
 
             return {
-                "response": jsonify({
-                    "type": "about:blank",
-                    "title": PROFILE_NOT_FOUND,
-                    "status": 404,
-                    "detail": f"Profile with UUID {uuid} not found",
-                    "instance": f"/profiles/{uuid}"
-                }),
-                "code_status": 404
+                "response": jsonify({"data": response_data}),
+                "code_status": 200
             }
 
         except Exception as e:

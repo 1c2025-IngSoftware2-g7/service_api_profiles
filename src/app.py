@@ -34,8 +34,14 @@ def create_profile():
 
 
 @profiles_app.get("/profiles/<uuid:uuid>")
-def get_specific_profiles(uuid):
-    result = profile_controller.get_specific_profiles(uuid)
+def get_private_profile(uuid):
+    result = profile_controller.get_specific_profiles(uuid, public_view=False)
+    return result["response"], result["code_status"]
+
+
+@profiles_app.get("/profiles/public/<uuid:uuid>")
+def get_public_profile(uuid):
+    result = profile_controller.get_specific_profiles(uuid, public_view=True)
     return result["response"], result["code_status"]
 
 
