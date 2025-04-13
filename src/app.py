@@ -33,19 +33,27 @@ def create_profile():
     return result["response"], result["code_status"]
 
 
+#curl - X POST http: // localhost: 8081/profiles - H "Content-Type: application/json" - d '{"uuid": "123e4567-e89b-12d3-a456-426614174000","email": "usuario@ejemplo.com","role": "student"}'
+
 @profiles_app.get("/profiles/<uuid:uuid>")
 def get_private_profile(uuid):
     result = profile_controller.get_specific_profiles(uuid, public_view=False)
     return result["response"], result["code_status"]
 
 
+#curl - X GET http: // localhost: 8081/profiles/123e4567-e89b-12d3-a456-426614174000
+
 @profiles_app.get("/profiles/public/<uuid:uuid>")
 def get_public_profile(uuid):
     result = profile_controller.get_specific_profiles(uuid, public_view=True)
     return result["response"], result["code_status"]
 
+# curl - X GET http: // localhost: 8081/profiles/public/123e4567-e89b-12d3-a456-426614174000
 
 @profiles_app.put("/profiles/modify")
 def modify_profile():
     result = profile_controller.modify_profile(request)
     return result["response"], result["code_status"]
+
+
+#curl - X PUT http: // localhost: 8081/profiles/modify - H "Content-Type: application/json" - d '{ "uuid": "123e4567-e89b-12d3-a456-426614174000", "updates": { "display_name": "Nuevo nombre", "location": "New York"}}'
