@@ -21,7 +21,7 @@ class ProfilesRepository(BaseEntity):
             birthday=profile_data["birthday"],
             gender=profile_data["gender"],
             description=profile_data["description"],
-            display_image=profile_data["display_image"]
+            display_image=profile_data["display_image"],
         )
 
     def profile_exists(self, profile_uuid: str) -> bool:
@@ -45,16 +45,22 @@ class ProfilesRepository(BaseEntity):
         """
 
         # Validar campos obligatorios
-        required_fields = ['uuid', 'email', 'role']
+        required_fields = ["uuid", "email", "role"]
         missing_fields = [
-            field for field in required_fields if field not in profile_data]
+            field for field in required_fields if field not in profile_data
+        ]
         if missing_fields:
-            raise ValueError(
-                f"Missing required fields: {', '.join(missing_fields)}")
+            raise ValueError(f"Missing required fields: {', '.join(missing_fields)}")
 
         # Establecer valores por defecto como NULL para campos opcionales no proporcionados
-        optional_fields = ['display_name', 'location',
-                        'birthday', 'gender', 'description', 'display_image']
+        optional_fields = [
+            "display_name",
+            "location",
+            "birthday",
+            "gender",
+            "description",
+            "display_image",
+        ]
         for field in optional_fields:
             if field not in profile_data:
                 profile_data[field] = None

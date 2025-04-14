@@ -18,7 +18,7 @@ def sample_profile_data():
         "email": "test@example.com",
         "role": "student",
         "display_name": "Test User",
-        "phone": "+1234567890"
+        "phone": "+1234567890",
     }
 
 
@@ -38,7 +38,6 @@ def client():
         yield client
 
 
-
 @pytest.fixture
 def setup_test_profile(client, sample_profile_data):
     # Crear perfil de prueba
@@ -49,6 +48,7 @@ def setup_test_profile(client, sample_profile_data):
 
     # Limpieza - eliminar perfil de prueba
     client.delete(f"/profiles/{sample_profile_data['uuid']}")
+
 
 # Tests para endpoints públicos
 

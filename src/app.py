@@ -18,6 +18,7 @@ profiles_app.logger.setLevel(log_level)
 profiles_logger = profiles_app.logger
 profile_controller = AppFactory.create(profiles_logger)
 
+
 @profiles_app.get("/health")
 def health_check():
     return {"status": "ok"}, 200
@@ -27,13 +28,16 @@ def health_check():
 Create a new profile.
 Expects JSON with: uuid, name, surname, email, etc.
 """
+
+
 @profiles_app.post("/profiles")
 def create_profile():
     result = profile_controller.create_profile(request)
     return result["response"], result["code_status"]
 
 
-#curl - X POST http: // localhost: 8081/profiles - H "Content-Type: application/json" - d '{"uuid": "123e4567-e89b-12d3-a456-426614174000","email": "usuario@ejemplo.com","role": "student"}'
+# curl - X POST http: // localhost: 8081/profiles - H "Content-Type: application/json" - d '{"uuid": "123e4567-e89b-12d3-a456-426614174000","email": "usuario@ejemplo.com","role": "student"}'
+
 
 @profiles_app.get("/profiles/<uuid:uuid>")
 def get_private_profile(uuid):
@@ -41,14 +45,17 @@ def get_private_profile(uuid):
     return result["response"], result["code_status"]
 
 
-#curl - X GET http: // localhost: 8081/profiles/123e4567-e89b-12d3-a456-426614174000
+# curl - X GET http: // localhost: 8081/profiles/123e4567-e89b-12d3-a456-426614174000
+
 
 @profiles_app.get("/profiles/public/<uuid:uuid>")
 def get_public_profile(uuid):
     result = profile_controller.get_specific_profiles(uuid, public_view=True)
     return result["response"], result["code_status"]
 
+
 # curl - X GET http: // localhost: 8081/profiles/public/123e4567-e89b-12d3-a456-426614174000
+
 
 @profiles_app.put("/profiles/modify")
 def modify_profile():
@@ -56,4 +63,4 @@ def modify_profile():
     return result["response"], result["code_status"]
 
 
-#curl - X PUT http: // localhost: 8081/profiles/modify - H "Content-Type: application/json" - d '{ "uuid": "123e4567-e89b-12d3-a456-426614174000", "updates": { "display_name": "Nuevo nombre", "location": "New York"}}'
+# curl - X PUT http: // localhost: 8081/profiles/modify - H "Content-Type: application/json" - d '{ "uuid": "123e4567-e89b-12d3-a456-426614174000", "updates": { "display_name": "Nuevo nombre", "location": "New York"}}'

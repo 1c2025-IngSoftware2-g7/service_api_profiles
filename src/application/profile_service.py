@@ -9,18 +9,17 @@ class ProfileService:
 
     def create_profile(self, profile_data: dict):
         # Validar campos obligatorios
-        required_fields = ['uuid', 'email', 'role']
+        required_fields = ["uuid", "email", "role"]
         missing_fields = [
-            field for field in required_fields if field not in profile_data]
+            field for field in required_fields if field not in profile_data
+        ]
         if missing_fields:
-            raise ValueError(
-                f"Missing required fields: {', '.join(missing_fields)}")
+            raise ValueError(f"Missing required fields: {', '.join(missing_fields)}")
 
         # Validar roles permitidos
-        valid_roles = ['student', 'teacher', 'admin']
-        if profile_data.get('role') not in valid_roles:
-            raise ValueError(
-                f"Invalid role. Must be one of: {', '.join(valid_roles)}")
+        valid_roles = ["student", "teacher", "admin"]
+        if profile_data.get("role") not in valid_roles:
+            raise ValueError(f"Invalid role. Must be one of: {', '.join(valid_roles)}")
 
         if self.profile_repository.profile_exists(profile_data["uuid"]):
             raise ValueError("Profile already exists for this user")
@@ -33,7 +32,7 @@ class ProfileService:
         if not profile:
             return None
         return profile
-    
+
     def modify_profile(self, uuid, updates):
         # Validar que el perfil exista
         if not self.profile_repository.profile_exists(uuid):
@@ -41,12 +40,16 @@ class ProfileService:
 
         # Campos permitidos para modificación
         allowed_fields = [
-            'display_name', 'location', 'birthday',
-            'gender', 'description', 'display_image'
+            "display_name",
+            "location",
+            "birthday",
+            "gender",
+            "description",
+            "display_image",
         ]
 
         # Campos no modificables
-        protected_fields = ['uuid', 'email', 'role']
+        protected_fields = ["uuid", "email", "role"]
         for field in protected_fields:
             if field in updates:
                 raise ValueError(f"Cannot modify protected field: {field}")
