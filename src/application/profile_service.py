@@ -46,6 +46,7 @@ class ProfileService:
             "gender",
             "description",
             "display_image",
+            "phone",
         ]
 
         # Campos no modificables
