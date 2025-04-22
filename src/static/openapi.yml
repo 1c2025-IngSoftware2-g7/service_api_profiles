@@ -1,0 +1,152 @@
+openapi: 3.0.0
+info:
+  title: Profiles API
+  description: API for managing user profiles, including public and private views.
+  version: 1.0.0
+servers:
+  - url: https://service-api-profiles-len6.onrender.com
+    description: Production server
+paths:
+  /health:
+    get:
+      summary: Check API status
+      responses:
+        '200':
+          description: Service is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /profiles:
+    post:
+      summary: Create a new profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Profile'
+      responses:
+        '201':
+          description: Profile created
+
+  /profiles/{uuid}:
+    get:
+      summary: Get private profile (detailed view)
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Private profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDetails'
+
+  /profiles/public/{uuid}:
+    get:
+      summary: Get public profile (limited view)
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Public profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicProfile'
+
+  /profiles/modify:
+    put:
+      summary: Modify an existing profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated successfully
+
+components:
+  schemas:
+    Profile:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        email:
+          type: string
+        role:
+          type: string
+          enum: [student, teacher]
+      required:
+        - uuid
+        - email
+        - role
+
+    ProfileDetails:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        email:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        display_name:
+          type: string
+        location:
+          type: string
+        role:
+          type: string
+      required:
+        - uuid
+        - email
+
+    PublicProfile:
+      type: object
+      properties:
+        display_name:
+          type: string
+        location:
+          type: string
+        role:
+          type: string
+
+    ProfileUpdate:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        updates:
+          type: object
+          properties:
+            display_name:
+              type: string
+            location:
+              type: string
+      required:
+        - uuid
+        - updates

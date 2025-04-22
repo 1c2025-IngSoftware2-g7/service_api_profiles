@@ -60,7 +60,7 @@ class ProfilesRepository(BaseEntity):
             "gender",
             "description",
             "display_image",
-            "phone"
+            "phone",
         ]
         for field in optional_fields:
             if field not in profile_data:
