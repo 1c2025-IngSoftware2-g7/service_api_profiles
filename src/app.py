@@ -4,6 +4,7 @@ import os
 from flask import Flask, request
 from flask_cors import CORS
 from src.app_factory import AppFactory
+from flask_swagger_ui import get_swaggerui_blueprint
 
 profiles_app = Flask(__name__)
 CORS(profiles_app)
@@ -18,6 +19,16 @@ profiles_app.logger.setLevel(log_level)
 profiles_logger = profiles_app.logger
 profile_controller = AppFactory.create(profiles_logger)
 
+SWAGGER_URL = '/docs'
+API_URL = '/static/openapi.yaml'
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Profiles API"
+    }
+)
+profiles_app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 @profiles_app.get("/health")
 def health_check():

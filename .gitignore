@@ -1,4 +1,8 @@
 /src/__pycache__/
+/src/domain/__pycache__/
+/src/infrastructure/config/__pycache__/
+/src/infrastructure/persistence/__pycache__/
+/src/presentation/__pycache__/
 /src/application/__pycache__/
 /tests/__pycache__/
 .pytest_cache
