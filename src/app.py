@@ -19,16 +19,13 @@ profiles_app.logger.setLevel(log_level)
 profiles_logger = profiles_app.logger
 profile_controller = AppFactory.create(profiles_logger)
 
-SWAGGER_URL = '/docs'
-API_URL = '/static/openapi.yaml'
+SWAGGER_URL = "/docs"
+API_URL = "/static/openapi.yaml"
 swaggerui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
-    config={
-        'app_name': "Profiles API"
-    }
+    SWAGGER_URL, API_URL, config={"app_name": "Profiles API"}
 )
 profiles_app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
 
 @profiles_app.get("/health")
 def health_check():
