@@ -15,9 +15,10 @@ profiles_app.permanent_session_lifetime = timedelta(minutes=5)
 
 env = os.getenv("FLASK_ENV")
 log_level = logging.DEBUG if env == "development" else logging.INFO
-profiles_app.logger.setLevel(log_level)
-profiles_logger = profiles_app.logger
-profile_controller = AppFactory.create(profiles_logger)
+logger = logging.getLogger(__name__) 
+logger.setLevel(log_level)
+
+profile_controller = AppFactory.create(logger)
 
 SWAGGER_URL = "/docs"
 API_URL = "/static/openapi.yaml"
@@ -72,3 +73,9 @@ def modify_profile():
 
 
 # curl - X PUT http: // localhost: 8081/profiles/modify - H "Content-Type: application/json" - d '{ "uuid": "123e4567-e89b-12d3-a456-426614174000", "updates": { "display_name": "Nuevo nombre", "location": "New York"}}'
+
+
+@profiles_app.post("/upload")
+def upload_image():
+    result = profile_controller.upload_image(request)
+    return result["response"], result["code_status"]

@@ -3,11 +3,10 @@ from src.headers import (
     PROFILE_CREATED,
     BAD_REQUEST,
     PROFILE_NOT_FOUND,
-    PROFILE_ALREADY_EXISTS,
     SERVER_ERROR,
 )
 from src.application.profile_service import ProfileService
-from src.domain.profile import Profile
+from src.presentation.error_generator import get_error_json
 
 
 class ProfileController:
@@ -48,7 +47,7 @@ class ProfileController:
                 "code_status": 400,
             }
         except Exception as e:
-            self.log.error(f"Error creating profile: {str(e)}")
+            self.log.error(f"Profile API - Error creating profile: {str(e)}")
             return {
                 "response": jsonify(
                     {"error": SERVER_ERROR, "detail": "Internal server error"}
@@ -102,7 +101,7 @@ class ProfileController:
             return {"response": jsonify({"data": response_data}), "code_status": 200}
 
         except Exception as e:
-            self.log.error(f"Error fetching profile: {str(e)}")
+            self.log.error(f"Profile API - Error fetching profile: {str(e)}")
             return {
                 "response": jsonify(
                     {"error": SERVER_ERROR, "detail": "Internal server error"}
@@ -190,5 +189,35 @@ class ProfileController:
                 "code_status": 400,
             }
         except Exception as e:
-            self.log.error(f"Error modifying profile: {str(e)}")
+            self.log.error(f"Profile API - Error modifying profile: {str(e)}")
             return {"response": jsonify({"error": SERVER_ERROR}), "code_status": 500}
+
+    def upload_image(self, request):
+        if not request.is_json:
+            return {"response": jsonify({"error": BAD_REQUEST}), "code_status": 400}
+        data = request.get_json()
+
+        if 'image' not in data or 'uuid' not in data:
+            return {
+                "response": get_error_json("Image and UUID are required", "Missing image or UUID in the request", "/upload", "POST"),
+                "code_status": 400,
+            }
+        uuid = data.get("uuid")
+        image = data.get("image")
+
+        if image.filename == '':
+            return {
+                "response": get_error_json("No selected file", "Missing image.filename in the request", "/upload", "POST"),
+                "code_status": 400,
+            }
+
+        url = self.profile_service.add_image(uuid, image)
+
+        return {
+            "response": jsonify({
+                "message": "Image uploaded",
+                "uuid": uuid,
+                "url": url
+            }),
+            "code_status": 200,
+        }
