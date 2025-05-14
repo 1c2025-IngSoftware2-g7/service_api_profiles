@@ -148,3 +148,4 @@ def test_upload_image_success(client):
         assert data["uuid"] == test_uuid
         assert data["url"].startswith("https://fake-gcs/")
         assert "Image uploaded" in data["message"]
+
