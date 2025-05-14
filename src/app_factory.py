@@ -5,8 +5,8 @@ from src.presentation.profile_controller import ProfileController
 
 class AppFactory:
     @staticmethod
-    def create(logger):
-        profile_repository = ProfilesRepository(logger)
-        profile_service = ProfileService(profile_repository, logger)
-        profile_controller = ProfileController(profile_service, logger)
+    def create():
+        profile_repository = ProfilesRepository()
+        profile_service = ProfileService(profile_repository)
+        profile_controller = ProfileController(profile_service)
         return profile_controller

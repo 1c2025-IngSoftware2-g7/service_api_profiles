@@ -9,8 +9,7 @@ from src.domain.profile import Profile
 
 
 class ProfileService:
-    def __init__(self, profile_repository: ProfilesRepository, logger):
-        self.log = logger
+    def __init__(self, profile_repository: ProfilesRepository):
         self.profile_repository = profile_repository
 
     def create_profile(self, profile_data: dict):
