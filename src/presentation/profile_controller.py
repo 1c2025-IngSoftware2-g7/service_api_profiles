@@ -192,17 +192,14 @@ class ProfileController:
             return {"response": jsonify({"error": SERVER_ERROR}), "code_status": 500}
 
     def upload_image(self, request):
-        if not request.is_json:
-            return {"response": jsonify({"error": BAD_REQUEST}), "code_status": 400}
-        data = request.get_json()
-
-        if 'image' not in data or 'uuid' not in data:
+        if 'uuid' not in request.form or 'image' not in request.files:
             return {
                 "response": get_error_json("Image and UUID are required", "Missing image or UUID in the request", "/upload", "POST"),
                 "code_status": 400,
             }
-        uuid = data.get("uuid")
-        image = data.get("image")
+
+        uuid = request.form['uuid']
+        image = request.files['image']
 
         if image.filename == '':
             return {
