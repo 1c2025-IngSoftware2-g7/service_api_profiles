@@ -15,10 +15,10 @@ profiles_app.permanent_session_lifetime = timedelta(minutes=5)
 
 env = os.getenv("FLASK_ENV")
 log_level = logging.DEBUG if env == "development" else logging.INFO
-logger = logging.getLogger(__name__) 
-logger.setLevel(log_level)
+profiles_app.logger.setLevel(log_level)
+profiles_logger = profiles_app.logger
 
-profile_controller = AppFactory.create(logger)
+profile_controller = AppFactory.create(profiles_logger)
 
 SWAGGER_URL = "/docs"
 API_URL = "/static/openapi.yaml"
