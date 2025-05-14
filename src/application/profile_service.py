@@ -7,20 +7,12 @@ load_dotenv()
 from src.infrastructure.persistence.profiles_repository import ProfilesRepository
 from src.domain.profile import Profile
 
-# Reconstruct JSON file from environment variable:
-credentials_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
-json_path = '/tmp/gcs-key.json'
-with open(json_path, 'w') as f:
-    f.write(credentials_json)
-
-# Initialize GCS:
-storage_client = storage.Client.from_service_account_json(json_path)
-bucket = storage_client.bucket(os.getenv('GCS_BUCKET_NAME'))
 
 class ProfileService:
     def __init__(self, profile_repository: ProfilesRepository, logger):
         self.log = logger
         self.profile_repository = profile_repository
+        self._add_gcp_credentials()
 
     def create_profile(self, profile_data: dict):
         # Validar campos obligatorios
@@ -78,11 +70,24 @@ class ProfileService:
 
         return self.profile_repository.update_profile(uuid, updates)
 
-    def add_image(uuid, file):
+    def add_image(self, uuid, file):
         """Save the image to GCP."""
+        bucket = self._get_gcp_bucket()
         ext = os.path.splitext(file.filename)[1]  # Extract extension (.jpg, .png, etc.)
         filename = f"{uuid}{ext}"
         blob = bucket.blob(filename)
         blob.upload_from_file(file, content_type=file.content_type)
         blob.make_public()
         return blob.public_url
+
+    def _get_gcp_bucket(self):
+        # Reconstruct JSON file from environment variable:
+        credentials_json = os.getenv('GOOGLE_CREDENTIALS_JSON')
+        json_path = '/tmp/gcs-key.json'
+        with open(json_path, 'w') as f:
+            f.write(credentials_json)
+
+        # Initialize GCS:
+        storage_client = storage.Client.from_service_account_json(json_path)
+        bucket = storage_client.bucket(os.getenv('GCS_BUCKET_NAME'))
+        return bucket
