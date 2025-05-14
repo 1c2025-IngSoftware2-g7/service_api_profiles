@@ -4,6 +4,8 @@ import uuid
 import os
 import time
 from dotenv import load_dotenv
+import io
+from unittest.mock import patch
 
 from src.app import profiles_app
 from src.headers import BAD_REQUEST, PROFILE_NOT_FOUND
@@ -34,9 +36,9 @@ def bad_request_data():
 
 @pytest.fixture
 def client():
+    profiles_app.config['TESTING'] = True
     with profiles_app.test_client() as client:
         yield client
-
 
 @pytest.fixture
 def setup_test_profile(client, sample_profile_data):
@@ -119,3 +121,31 @@ def test_health_check(client):
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json == {"status": "ok"}
+
+
+# def test_upload_image_success(client):
+#     test_uuid = str(uuid.uuid4())
+#     test_filename = f"{test_uuid}.jpg"
+#     dummy_image = (io.BytesIO(b"fake-image-data"), test_filename)
+
+#     with patch("app.storage_client") as mock_storage_client:
+#         # Mock del bucket y blob
+#         mock_bucket = mock_storage_client.bucket.return_value
+#         mock_blob = mock_bucket.blob.return_value
+#         mock_blob.public_url = f"https://fake-gcs/{test_filename}"
+
+#         response = client.post(
+#             "/upload",
+#             data={
+#                 "uuid": test_uuid,
+#                 "image": (dummy_image[0], dummy_image[1])
+#             },
+#             content_type='multipart/form-data'
+#         )
+
+#         assert response.status_code == 200
+#         data = response.get_json()
+#         assert data["uuid"] == test_uuid
+#         assert data["url"].startswith("https://fake-gcs/")
+#         assert "Image uploaded" in data["message"]
+
