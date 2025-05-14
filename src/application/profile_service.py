@@ -12,7 +12,6 @@ class ProfileService:
     def __init__(self, profile_repository: ProfilesRepository, logger):
         self.log = logger
         self.profile_repository = profile_repository
-        self._add_gcp_credentials()
 
     def create_profile(self, profile_data: dict):
         # Validar campos obligatorios
