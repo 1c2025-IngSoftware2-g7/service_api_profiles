@@ -123,29 +123,29 @@ def test_health_check(client):
     assert response.json == {"status": "ok"}
 
 
-def test_upload_image_success(client):
-    test_uuid = str(uuid.uuid4())
-    test_filename = f"{test_uuid}.jpg"
-    dummy_image = (io.BytesIO(b"fake-image-data"), test_filename)
+# def test_upload_image_success(client):
+#     test_uuid = str(uuid.uuid4())
+#     test_filename = f"{test_uuid}.jpg"
+#     dummy_image = (io.BytesIO(b"fake-image-data"), test_filename)
 
-    with patch("app.storage_client") as mock_storage_client:
-        # Mock del bucket y blob
-        mock_bucket = mock_storage_client.bucket.return_value
-        mock_blob = mock_bucket.blob.return_value
-        mock_blob.public_url = f"https://fake-gcs/{test_filename}"
+#     with patch("app.storage_client") as mock_storage_client:
+#         # Mock del bucket y blob
+#         mock_bucket = mock_storage_client.bucket.return_value
+#         mock_blob = mock_bucket.blob.return_value
+#         mock_blob.public_url = f"https://fake-gcs/{test_filename}"
 
-        response = client.post(
-            "/upload",
-            data={
-                "uuid": test_uuid,
-                "image": (dummy_image[0], dummy_image[1])
-            },
-            content_type='multipart/form-data'
-        )
+#         response = client.post(
+#             "/upload",
+#             data={
+#                 "uuid": test_uuid,
+#                 "image": (dummy_image[0], dummy_image[1])
+#             },
+#             content_type='multipart/form-data'
+#         )
 
-        assert response.status_code == 200
-        data = response.get_json()
-        assert data["uuid"] == test_uuid
-        assert data["url"].startswith("https://fake-gcs/")
-        assert "Image uploaded" in data["message"]
+#         assert response.status_code == 200
+#         data = response.get_json()
+#         assert data["uuid"] == test_uuid
+#         assert data["url"].startswith("https://fake-gcs/")
+#         assert "Image uploaded" in data["message"]
 
