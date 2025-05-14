@@ -5,8 +5,7 @@ from src.infrastructure.persistence.base_entity import BaseEntity
 
 
 class ProfilesRepository(BaseEntity):
-    def __init__(self, logger):
-        self.log = logger
+    def __init__(self):
         super().__init__()
 
     def _parse_profile(self, profile_data):
