@@ -1,4 +1,5 @@
 from google.cloud import storage
+from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
@@ -75,8 +76,12 @@ class ProfileService:
         filename = f"{uuid}{ext}"
         blob = bucket.blob(filename)
         blob.upload_from_file(file, content_type=file.content_type)
-        blob.make_public()
-        return blob.public_url
+        url = blob.generate_signed_url(
+            version="v4",
+            expiration=timedelta(minutes=15),
+            method="GET",
+        )
+        return url
 
     def _get_gcp_bucket(self):
         # Reconstruct JSON file from environment variable:
