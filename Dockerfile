@@ -10,9 +10,10 @@ WORKDIR /
 COPY requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install newrelic
 
 COPY . .
 
-CMD python -m flask run --host=0.0.0.0 --port=8080
+CMD  newrelic-admin run-program python -m flask run --host=0.0.0.0 --port=8080
 
 EXPOSE 8080

@@ -1,4 +1,4 @@
-from flask import jsonify, current_app
+from flask import jsonify
 from src.headers import (
     PROFILE_CREATED,
     BAD_REQUEST,
@@ -7,7 +7,9 @@ from src.headers import (
 )
 from src.application.profile_service import ProfileService
 from src.presentation.error_generator import get_error_json
+from src.logger_config import get_logger
 
+logger = get_logger("api-profiles")
 
 class ProfileController:
     def __init__(self, profile_service: ProfileService):
@@ -46,7 +48,7 @@ class ProfileController:
                 "code_status": 400,
             }
         except Exception as e:
-            current_app.logger.error(f"Profile API - Error creating profile: {str(e)}")
+            logger.error(f"Profile API - Error creating profile: {str(e)}")
             return {
                 "response": jsonify(
                     {"error": SERVER_ERROR, "detail": "Internal server error"}
@@ -100,7 +102,7 @@ class ProfileController:
             return {"response": jsonify({"data": response_data}), "code_status": 200}
 
         except Exception as e:
-            current_app.logger.error(f"Profile API - Error fetching profile: {str(e)}")
+            logger.error(f"Profile API - Error fetching profile: {str(e)}")
             return {
                 "response": jsonify(
                     {"error": SERVER_ERROR, "detail": "Internal server error"}
@@ -188,7 +190,7 @@ class ProfileController:
                 "code_status": 400,
             }
         except Exception as e:
-            current_app.logger.error(f"Profile API - Error modifying profile: {str(e)}")
+            logger.error(f"Profile API - Error modifying profile: {str(e)}")
             return {"response": jsonify({"error": SERVER_ERROR}), "code_status": 500}
 
     def upload_image(self, request):
