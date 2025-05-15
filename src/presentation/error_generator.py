@@ -1,7 +1,11 @@
-from flask import jsonify, current_app
+from flask import jsonify
+
+from src.logger_config import get_logger
+
+logger = get_logger("api-profiles")
 
 def get_error_json(title, detail, url, method="GET"):
-    current_app.logger.error(f"Profile API - {method} {url} - {title}: {detail}")
+    logger.error(f"Profile API - {method} {url} - {title}: {detail}")
     return jsonify(
         {
             "type": "about:blank",

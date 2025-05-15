@@ -1,10 +1,11 @@
 from datetime import timedelta
-import logging
 import os
 from flask import Flask, request
 from flask_cors import CORS
-from src.app_factory import AppFactory
 from flask_swagger_ui import get_swaggerui_blueprint
+
+from src.app_factory import AppFactory
+from src.logger_config import get_logger
 
 profiles_app = Flask(__name__)
 CORS(profiles_app)
@@ -13,9 +14,8 @@ CORS(profiles_app)
 profiles_app.secret_key = os.getenv("SECRET_KEY_SESSION")
 profiles_app.permanent_session_lifetime = timedelta(minutes=5)
 
-env = os.getenv("FLASK_ENV")
-log_level = logging.DEBUG if env == "development" else logging.INFO
-profiles_app.logger.setLevel(log_level)
+# Logger config
+logger = get_logger("api-profiles")
 
 profile_controller = AppFactory.create()
 
@@ -32,14 +32,12 @@ def health_check():
     return {"status": "ok"}, 200
 
 
-"""
-Create a new profile.
-Expects JSON with: uuid, name, surname, email, etc.
-"""
-
-
 @profiles_app.post("/profiles")
 def create_profile():
+    """
+    Create a new profile.
+    Expects JSON with: uuid, name, surname, email, etc.
+    """
     result = profile_controller.create_profile(request)
     return result["response"], result["code_status"]
 

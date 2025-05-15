@@ -1,5 +1,8 @@
 import os
 
+from src.logger_config import get_logger
+
+logger = get_logger("api-profiles")
 
 class DatabaseConfig:
     host: str
@@ -22,4 +25,6 @@ class DatabaseConfig:
 
     @property
     def connection_strings(self) -> str:
-        return f"dbname={self.database} user={self.user} host={self.host} password={self.password} port={self.port}"
+        connection_strings = f"dbname={self.database} user={self.user} host={self.host} password={self.password} port={self.port}"
+        logger.debug(f"Profile API - connection_strings: {connection_strings}")
+        return connection_strings
