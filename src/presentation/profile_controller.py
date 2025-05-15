@@ -210,6 +210,7 @@ class ProfileController:
             }
 
         url = self.profile_service.add_image(uuid, image)
+        logger.info(f"Image saved in Google Cloud Storage ")
 
         return {
             "response": jsonify({
