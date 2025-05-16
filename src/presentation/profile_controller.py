@@ -77,6 +77,7 @@ class ProfileController:
             if public_view:
                 # Solo campos públicos
                 response_data = {
+                    "role": profile.role,
                     "display_name": profile.display_name,
                     "phone": profile.phone,
                     "birthday": profile.birthday,
