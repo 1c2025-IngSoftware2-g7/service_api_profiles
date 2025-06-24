@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-profiles
+  labels:
+    app: api-profiles
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-profiles
+  template:
+    metadata:
+      labels:
+        app: api-profiles
+    spec:
+      containers:
+        - name: api-profiles
+          image: us-central1-docker.pkg.dev/crypto-isotope-463815-t0/docker-repository/api-profiles:v1
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+          env:
+            - name: DB_HOST
+              value: postgres-service
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: profiles_db
+            - name: DB_USER
+              value: profiles_user
+            - name: DB_PASSWORD
+              value: profiles_user_pass
+            - name: SECRET_KEY_SESSION
+              value: ids2g71c2025
+            - name: OAUTH_REDIRECT_URI
+              value: https://service-api-profiles.onrender.com/profiles/authorize
+            - name: GOOGLE_CLIENT_SECRET
+              value: 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
+            - name: GOOGLE_CLIENT_ID
+              value: 985128316026-v767el5qp9lanikh52up5m4ifs5usqdd.apps.googleusercontent.com
