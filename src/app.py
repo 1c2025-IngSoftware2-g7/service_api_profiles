@@ -46,7 +46,7 @@ def create_profile():
 
 
 @profiles_app.get("/profiles")
-def get_private_profile():
+def get_all_profile():
     result = profile_controller.get_all_profiles()
     return result["response"], result["code_status"]
 
