@@ -95,7 +95,7 @@ class ProfilesRepository(BaseEntity):
         self.cursor.execute(query, params)
         profiles = self.cursor.fetchall()
 
-        if not profile:
+        if not profiles:
             return []
 
         # Mapear resultados a un diccionario
