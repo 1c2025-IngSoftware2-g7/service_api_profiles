@@ -88,6 +88,26 @@ class ProfilesRepository(BaseEntity):
         profile_data = dict(zip(columns, profile))
         return self._parse_profile(profile_data)
 
+
+    def get_profiles(self):
+        query = "SELECT * FROM profiles"
+        params = ()
+        self.cursor.execute(query, params)
+        profiles = self.cursor.fetchall()
+
+        if not profile:
+            return []
+
+        # Mapear resultados a un diccionario
+        profiles_final = []
+        columns = [desc[0] for desc in self.cursor.description]
+        for profile in profiles:
+            profile_data = dict(zip(columns, profile))
+            profile_p = self._parse_profile(profile_data)
+            profiles_final.append(profile_p)
+
+        return profiles_final
+
     def update_profile(self, uuid, updates):
         # Construir la consulta dinámica
         set_clause = ", ".join([f"{field} = %s" for field in updates.keys()])
