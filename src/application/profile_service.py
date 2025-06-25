@@ -42,6 +42,12 @@ class ProfileService:
         if not profile:
             return None
         return profile
+    
+    def get_all_profiles(self):
+        profiles = self.profile_repository.get_profiles()
+        if not profiles:
+            return []
+        return profiles
 
     def modify_profile(self, uuid, updates):
         # Validar que el perfil exista

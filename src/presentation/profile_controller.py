@@ -110,6 +110,36 @@ class ProfileController:
                 ),
                 "code_status": 500,
             }
+        
+    def get_all_profiles(self):
+        try:
+            profiles = self.profile_service.get_all_profiles()
+
+            response_data = []
+            for profile in profiles:
+                response_data.append({
+                    "uuid": profile.uuid,
+                    "email": profile.email,
+                    "role": profile.role,
+                    "display_name": profile.display_name,
+                    "location": profile.location,
+                    "birthday": profile.birthday,
+                    "gender": profile.gender,
+                    "description": profile.description,
+                    "display_image": profile.display_image,
+                    "phone": profile.phone,
+                })
+
+            return {"response": jsonify({"data": response_data}), "code_status": 200}
+
+        except Exception as e:
+            logger.error(f"Profile API - Error fetching profiles: {str(e)}")
+            return {
+                "response": jsonify(
+                    {"error": SERVER_ERROR, "detail": f"Internal server error: {str(e)}"}
+                ),
+                "code_status": 500,
+            }
 
     def modify_profile(self, request):
         if not request.is_json:

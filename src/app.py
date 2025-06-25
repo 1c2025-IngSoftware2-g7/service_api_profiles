@@ -45,6 +45,12 @@ def create_profile():
 # curl - X POST http: // localhost: 8081/profiles - H "Content-Type: application/json" - d '{"uuid": "123e4567-e89b-12d3-a456-426614174000","email": "usuario@ejemplo.com","role": "student"}'
 
 
+@profiles_app.get("/profiles")
+def get_private_profile():
+    result = profile_controller.get_all_profiles()
+    return result["response"], result["code_status"]
+
+
 @profiles_app.get("/profiles/<uuid:uuid>")
 def get_private_profile(uuid):
     result = profile_controller.get_specific_profiles(uuid, public_view=False)
