@@ -1,104 +1,70 @@
-# ClassConnect - API Users
+# ClassConnect - API Profiles
 
 ## Contenidos
 1. Introducción
-2. Pre-requisitos
-3. CI-CD
-4. Tests
-5. Comandos para construir la imagen de Docker
-6. Comandos para correr la base de datos
-7. Comandos para correr la imagen del servicio
+2. Arquitectura de componentes, Pre-requisitos, CI-CD, Test, Comandos, Despliegue en la nube
+3. Test coverage
+4. Base de datos
+5. Funcionalidades
 
 ## 1. Introducción
 
 Microservicio para la gestión de Perfiles en ClassConnect.
+
+Se utilizó por una [arquitectura en capas](https://dzone.com/articles/layered-architecture-is-good).
+
 Permite:
     - Creación de perfiles nuevos.
     - Edición de perfiles.
     - Visualizacion de perfil propio, con todos los datos.
     - Visualización de perfiles de otros, con solo datos publicos.
 
-## 2. Pre-requisitos
-- Necesario para levantar el entorno de desarrollo de forma local:
-    - [Docker](https://docs.docker.com/get-started/introduction/) (version 27.3.1) 
-    - [Docker-compose](https://docs.docker.com/compose/install/) (version 2.30.3)
+# 2. Arquitectura de componentes, Pre-requisitos, CI-CD, Test, Comandos, Despliegue en la nube
 
-- Puertos utilizados: 
-    - 5432: Utilizado por la base de datos PostgreSQL.
-    - 8080: Utilizado por la API.
+[Explicados en API Gateway](https://github.com/1c2025-IngSoftware2-g7/api_gateway)
 
-Adicionalmente, se menciona a continuación lo utilizado dentro de los contenedores:
+# 3. Test coverage
 
-- Lenguaje:
-    - Python 3.13 (Utilizado en la imagen del Dockerfile).
+[Coverage User Service (codecov)](app.codecov.io/github/1c2025-IngSoftware2-g7/service_api_profiles/)
 
-- Base de datos:
-    - PostgreSQL 15 (imagen oficial).
+# 4. Base de datos
 
-- Gestión de paquetes:
-    - pip (se usa dentro del contenedor para instalar dependencias).
+## PostgreSQL
 
+La base de datos está diseñada para almacenar, consultar y mantener la información crítica relacionada con los usuarios del sistema, incluyendo credenciales, tokens, preferencias y roles.    
 
-## 3. CI-CD
+# 5. Funcionalidades
+1. Edición de perfil:
 
-Se realizó un [repositorio template de los workflows](https://github.com/1c2025-IngSoftware2-g7/ci_templates/tree/main) de test y deploy en Render, el cual se reutiliza en todos los repos del backend realizados en python.
-Se corre, en los tests:
-    - Set up Python
-    - Install dependencies
-    - Lint with flake8
-    - Run tests in Docker
-    - Upload to Codecov
+    Permite a los usuarios modificar los datos de su propio perfil, incluyendo campos como nombre para mostrar, ubicación y otros atributos personales personalizados.
 
-En el deploy: 
-    - Checkout code (clone del repositorio).
-    - Set up Python
-    - Install dependencies
-    - Trigger deploy in Render
+2. Visualización de perfil propio:
 
-### Test coverage
+    Los usuarios pueden acceder a la información completa y privada de su perfil, con todos los detalles personales almacenados.
 
-[![codecov](https://codecov.io/gh/1c2025-IngSoftware2-g7/service_api_profiles/branch/<RAMA>/graph/badge.svg)](https://codecov.io/gh/1c2025-IngSoftware2-g7/service_api_profiles)
+3. Visualización de perfil de otros usuarios:
 
+    Permite consultar la información pública de los perfiles de otros usuarios, mostrando solo los datos que no son sensibles o privados.
 
-## 4. Tests
-Para la implementación de los test de integración, se utilizó la librería [pytest](https://www.psycopg.org/psycopg3/docs/basic/index.html).  
-Estos se encuentran desarrollados en ```./tests/api_test.py```.  
+4. Creación de perfil:
 
+    Proporciona la capacidad para crear un nuevo perfil de usuario con datos iniciales como UUID, nombre, apellido, correo electrónico, rol y otros campos necesarios.
 
-## 5. Comandos para construir la imagen de Docker
-Al utilizar docker-compose, se puede construir todas las imágenes definidas en docker-compose.yml con el siguiente comando:
-```bash
-docker compose build
-```
+5. Obtención de todos los perfiles:
 
-## 6. Comandos para correr la base de datos
-Como ya se mencionó, se utilizó docker compose para correr el servicio de forma local. Por lo que para levantar todas las imágenes del proyecto, se debe correr:
-```bash
-docker compose up
-```
+    Permite recuperar una lista completa con todos los perfiles almacenados en el sistema.
 
-En ```docker-compose.yml```:
-- db local: Base de datos PostgreSQL. Se define la imagen oficial, los parámetros para la conexión, el puerto en el que escuchará (5432) y se carga el script que se debe correr para inicializar la base de datos.  
+6. Obtención de perfil privado específico
+    Permite obtener el perfil completo, con datos privados, de un usuario determinado identificado por su UUID.
 
-> Para construir el docker de la base de datos y el script para levantar la base de datos y crear la tabla (cuando se corre por primera vez el proyecto), se utilizó [esta documentación](https://hub.docker.com/_/postgres).  
-Se puede observar el script que se corre luego de levantarse la base de datos en: ```./initialize_profiles_db.sql```. Este fue incluido en el directorio ```/docker-entrypoint-initdb.d/``` dentro del contenedor, por lo que PostgreSQL lo ejecuta automáticamente cuando el contenedor se levanta por primera vez.
+7. Obtención de perfil público específico:
 
-> En Render se corrieron los comandos sobre la base de datos, directamente sobre la base levantada en Render.
+    Permite obtener la versión pública del perfil de un usuario determinado identificado por su UUID, ocultando información sensible.
 
-## 7. Comandos para correr la imagen del servicio
-De igual forma que en el inciso anterior:
-```bash
-docker compose up
-```
+8. Modificación de perfil existente:
 
-En ```docker-compose.yml```:
-- app: API RESTful en Flask. Se utiliza como imagen la definida en Dockerfile. Se indica el puerto 8080 para comunicarse con este servicio y se incluye en la misma red que la base de datos, de esta forma se pueden comunicar. Además, se define que este servicio se va a correr cuando se termine de levantar la base de datos. Por último, se indica el comando que se va a correr.
+    Facilita la actualización de uno o más campos del perfil de un usuario, identificado por su UUID, enviando los datos a modificar.
 
-## 8. Despliegue en la Nube 
+9. Carga de imagen de perfil:
 
-Se encuentra desplegada en Render. 
-Se puede ingresar a través del siguiente link: https://service-api-profiles-len6.onrender.com
-
-Se levantó el servicio que escucha las request sobre la API de Perfiles. Para esto se construye la imagen en Render a partir del Dockerfile y se corre con el comando descrito en este archivo.
-Además, se deployó de forma separada la base de datos en PostgreSQL. Con la cual se comunica el backend de Perfiles a través de los datos de conexión de esta base indicados en el Environments de nuestro servicio.
-
+    Permite subir y asociar una imagen al perfil del usuario, facilitando la personalización visual del perfil.
