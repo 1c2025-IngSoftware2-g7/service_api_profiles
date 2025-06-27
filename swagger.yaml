@@ -1,0 +1,230 @@
+openapi: 3.0.0
+info:
+  title: Profiles API
+  version: 1.0.0
+  description: Microservicio para gestión de perfiles educativos en ClassConnect
+
+tags:
+  - name: Health
+    description: Health Checkpoints for the service
+  - name: Profiles
+    description: Operations related to user profiles
+  - name: Images
+    description: Operations related to profile images
+
+servers:
+  - url: https://service-api-profiles.onrender.com
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+
+  /profiles:
+    get:
+      tags:
+        - Profiles
+      summary: Get all profiles (admin only)
+      responses:
+        '200':
+          description: A list of profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Profile'
+    post:
+      tags:
+        - Profiles
+      summary: Create a new profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileCreate'
+      responses:
+        '201':
+          description: Profile created
+        '400':
+          description: Bad request (missing/invalid fields)
+        '409':
+          description: Profile already exists
+
+  /profiles/{uuid}:
+    get:
+      tags:
+        - Profiles
+      summary: Get private profile data (owner/admin only)
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '404':
+          description: Profile not found
+
+  /profiles/public/{uuid}:
+    get:
+      tags:
+        - Profiles
+      summary: Get public profile data
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Public profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicProfile'
+        '404':
+          description: Profile not found
+
+  /upload:
+    post:
+      tags:
+        - Images
+      summary: Upload profile image
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+        '400':
+          description: Invalid image or missing UUID
+
+components:
+  schemas:
+    Profile:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [student, teacher, admin]
+        display_name:
+          type: string
+        phone:
+          type: string
+        location:
+          type: string
+        birthday:
+          type: string
+          format: date
+        gender:
+          type: string
+        description:
+          type: string
+        display_image:
+          type: string
+        career:
+          type: string
+        year_of_study:
+          type: integer
+        specialization:
+          type: string
+        degrees:
+          type: array
+          items:
+            type: string
+
+    ProfileCreate:
+      type: object
+      required:
+        - uuid
+        - email
+        - role
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [student, teacher, admin]
+        display_name:
+          type: string
+        phone:
+          type: string
+        location:
+          type: string
+        birthday:
+          type: string
+          format: date
+        gender:
+          type: string
+        description:
+          type: string
+
+    PublicProfile:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [student, teacher, admin]
+        display_name:
+          type: string
+        display_image:
+          type: string
+        location:
+          type: string
+        description:
+          type: string
+        career:
+          type: string
+        year_of_study:
+          type: integer
+        specialization:
+          type: string
+        degrees:
+          type: array
+          items:
+            type: string
