@@ -13,7 +13,7 @@ tags:
     description: Operations related to profile images
 
 servers:
-  - url: https://service-api-profiles.onrender.com
+  - url: https://104.155.165.82
 
 paths:
   /health:
@@ -130,6 +130,87 @@ paths:
                     type: string
         '400':
           description: Invalid image or missing UUID
+  
+  /profiles/modify:
+    post:
+      tags:
+        - Profiles
+      summary: Modification of a profile
+      description: |
+        Modify user profile fields. Only certain fields are allowed to be modified.
+        Email and password cannot be updated through this endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - uuid
+                - updates
+              properties:
+                uuid:
+                  type: string
+                  format: uuid
+                  description: UUID of the user whose profile will be updated.
+                updates:
+                  type: object
+                  additionalProperties: true
+                  description: |
+                    Key-value pairs of fields to update.
+                  example:
+                    display_name: "John Doe"
+                    location: "New York"
+                    birthday: "1990-01-01"
+                    gender: "male"
+                    description: "New bio"
+                    display_image: "https://example.com/avatar.png"
+                    phone: "+1234567890"
+      responses:
+        '200':
+          description: Profile updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Profile updated successfully
+                  data:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                        format: uuid
+                      updated_fields:
+                        type: object
+                        additionalProperties: true
+        '400':
+          description: Bad request. Possible reasons include missing required fields, invalid fields, or attempt to modify forbidden fields.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  detail:
+                    type: string
+                    nullable: true
+                  message:
+                    type: string
+                    nullable: true
+        '500':
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
 
 components:
   schemas:
